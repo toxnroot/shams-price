@@ -1,103 +1,177 @@
-import Image from "next/image";
+// app/page.jsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import SectionCard from '@/components/SectionCard';
+import Loading from '@/components/loading';
+import { TourProvider  } from '@reactour/tour';
+
+const steps = [
+  {
+    selector: '.section-card',
+    content: 'الخامات هي الأقسام المتاحة لك. يمكنك الضغط على أي قسم لعرض التفاصيل الخاصة به.',
+  },
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [sections, setSections] = useState({});
+  const [status, setStatus] = useState('');
+  const [userRole, setUserRole] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showNoSectionsMessage, setShowNoSectionsMessage] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  useEffect(() => {
+    const userUid = typeof window !== 'undefined' ? localStorage.getItem('userUid') : null;
+    if (!userUid) {
+      setStatus('يرجى تسجيل الدخول أولاً');
+      setLoading(false);
+      setShowNoSectionsMessage(false);
+      return;
+    }
+
+    const userDocRef = doc(db, 'users', userUid);
+    const unsubscribeUser = onSnapshot(
+      userDocRef,
+      (userSnap) => {
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setUserRole(userData.role || []);
+          setStatus('');
+        } else {
+          setUserRole([]);
+          setStatus('بيانات المستخدم غير موجودة');
+          setLoading(false);
+          setShowNoSectionsMessage(true);
+        }
+      },
+      (error) => {
+        setStatus(`خطأ أثناء جلب بيانات المستخدم: ${error.message}`);
+        setLoading(false);
+        setShowNoSectionsMessage(true);
+      }
+    );
+
+    return () => unsubscribeUser();
+  }, []);
+
+  useEffect(() => {
+    if (userRole.length === 0) {
+      setSections({});
+      // تأخير إظهار الرسالة لمدة 3 ثوانٍ
+      const timer = setTimeout(() => {
+        setShowNoSectionsMessage(true);
+        setLoading(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+
+    const allSections = {};
+    let completed = 0;
+
+    // إعداد مؤقت لمدة 3 ثوانٍ
+    const timer = setTimeout(() => {
+      if (Object.keys(allSections).length === 0) {
+        setShowNoSectionsMessage(true);
+        setLoading(false);
+      }
+    }, 4000);
+
+    userRole.forEach((role) => {
+      const docRef = doc(db, 'priceing', role);
+      onSnapshot(
+        docRef,
+        (docSnap) => {
+          completed++;
+          allSections[role] = docSnap.exists() ? docSnap.data() : {};
+          if (completed === userRole.length) {
+            setSections({ ...allSections });
+            setLoading(false);
+            // إذا تم جلب الأقسام، لا تظهر رسالة "لا يوجد أقسام"
+            if (Object.keys(allSections).length > 0) {
+              setShowNoSectionsMessage(false);
+            } else {
+              setShowNoSectionsMessage(true);
+            }
+            clearTimeout(timer); // إلغاء المؤقت إذا اكتمل الجلب
+          }
+        },
+        (error) => {
+          setStatus(`خطأ أثناء جلب الأقسام: ${error.message}`);
+          setLoading(false);
+          setShowNoSectionsMessage(true);
+          clearTimeout(timer);
+        }
+      );
+    });
+
+    return () => clearTimeout(timer);
+  }, [userRole]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
+        <Loading />
+      </div>
+    );
+  }
+
+  return (
+    <ProtectedRoute>
+      <TourProvider steps={steps} showBadge={false} locale={{ close: 'إغلاق', last: 'إنهاء', next: 'التالي', skip: 'تخطي' }}   styles={{
+    popover: (base) => ({
+      ...base,
+      backgroundColor: '#fff8f0',
+      borderRadius: '16px',
+      padding: '20px',
+      color: '#333',
+      fontFamily: 'Cairo, sans-serif',
+      direction: 'rtl',
+    }),
+    maskArea: (base) => ({
+      ...base,
+      rx: 8, // حواف دائرية للعنصر المضاء
+    }),
+    controls: (base) => ({
+      ...base,
+      justifyContent: 'flex-start', // لتكون الأزرار في اليمين (للعربية)
+    }),
+    badge: (base) => ({
+      ...base,
+      backgroundColor: '#A16D28',
+    }),
+    close: (base) => ({
+      ...base,
+      color: '#A16D28',
+      fontSize: '20px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      top: '10px',
+      '&:hover': {
+        color: '#A16D28',
+      },
+
+    }),
+  }} >
+      <div className="min-h-screen max-h-full p-6 bg-gray-100 flex flex-col items-center justify-center">
+        {status && (
+          <p className={`text-sm text-center mb-4 ${status.includes('بنجاح') ? 'text-green-600' : 'text-red-600'}`}>
+            {status}
+          </p>
+        )}
+        {showNoSectionsMessage && Object.keys(sections).length === 0 ? (
+          <p className="text-center text-gray-500 text-lg font-medium">لا يوجد أقسام متاحة</p>
+        ) : (
+          Object.keys(sections).length > 0 && (
+            Object.keys(sections).map((docId) => (
+              <SectionCard key={docId} docId={docId} sections={sections[docId]} />
+            ))
+          )
+        )}
+      </div>
+      </TourProvider>
+    </ProtectedRoute>
   );
 }
