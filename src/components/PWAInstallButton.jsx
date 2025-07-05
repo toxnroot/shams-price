@@ -67,6 +67,7 @@ export default function PWAInstallButton() {
 
   return (
     <div className="fixed top-0 right-0 z-50 w-full h-screen bg-white flex justify-center items-center flex-col gap-4">
+        <Image src='/logo.ico' width={100} height={100} alt='logo'/>
         <h1>ثبت التطبيق على جهازك</h1>
         <div className='bg-[#a0865867]  h-fit flex justify-center items-center flex-col gap-4 p-4 rounded-md'>
       <div className='flex justify-center items-center gap-2'>
