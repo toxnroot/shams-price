@@ -2,28 +2,29 @@
 
 import { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
+import Image from 'next/image';
 
 export default function PWAInstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
 
-  // التحقق من إمكانية التثبيت ونوع الجهاز
   useEffect(() => {
-    // التحقق مما إذا كان التطبيق مثبتًا بالفعل
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
     if (isStandalone) {
       setIsInstallable(false);
       return;
     }
 
-    // التحقق مما إذا كان الجهاز iOS
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIOSDevice = /iphone|ipad|ipod/.test(userAgent) && !window.MSStream;
-    setIsIOS(isIOSDevice);
+    const isAndroidDevice = /android/.test(userAgent);
 
-    // التحقق من دعم beforeinstallprompt (لـ Android ومتصفحات أخرى)
+    setIsIOS(isIOSDevice);
+    setIsDesktop(!isIOSDevice && !isAndroidDevice);
+
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -32,7 +33,6 @@ export default function PWAInstallButton() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // إذا كان iOS، تحقق من إمكانية التثبيت
     if (isIOSDevice) {
       setIsInstallable(true);
     }
@@ -42,7 +42,6 @@ export default function PWAInstallButton() {
     };
   }, []);
 
-  // معالجة النقر على زر التثبيت
   const handleInstallClick = async () => {
     if (isIOS) {
       setShowInstructions(true);
@@ -60,18 +59,39 @@ export default function PWAInstallButton() {
     }
   };
 
-  // إغلاق تعليمات iOS
   const closeInstructions = () => {
     setShowInstructions(false);
   };
 
-  // إذا لم يكن التطبيق قابلًا للتثبيت، لا تعرض شيئًا
-  if (!isInstallable) {
-    return null;
-  }
+  if (!isInstallable) return null;
 
   return (
-    <div className="fixed top-8 right-8 z-50">
+    <div className="fixed top-0 right-0 z-50 w-full h-screen bg-white flex justify-center items-center flex-col gap-4">
+        <h1>ثبت التطبيق على جهازك</h1>
+        <div className='bg-[#a0865867]  h-fit flex justify-center items-center flex-col gap-4 p-4 rounded-md'>
+      <div className='flex justify-center items-center gap-2'>
+        {isIOS && (
+          <div className='apple flex justify-center items-center gap-2 flex-col'>
+            <Image src='/apple.png' width={60} height={60} alt='apple' />
+            <p>iOS</p>
+          </div>
+        )}
+
+        {!isIOS && !isDesktop && (
+          <div className='android flex justify-center items-center gap-2 flex-col'>
+            <Image src='/android.png' width={60} height={60} alt='android' />
+            <p>Android</p>
+          </div>
+        )}
+
+        {isDesktop && (
+          <div className='desktop flex justify-center items-center gap-2 flex-col'>
+            <Image src='/desktop.png' width={120} height={120} alt='desktop' />
+            <p>جهاز الكمبيوتر</p>
+          </div>
+        )}
+      </div>
+
       {/* زر التثبيت */}
       <button
         onClick={handleInstallClick}
@@ -99,7 +119,9 @@ export default function PWAInstallButton() {
             <li>اضغط على <strong>إضافة</strong> في الزاوية العلوية اليمنى.</li>
           </ol>
         </div>
+        
       )}
+      </div>
     </div>
   );
 }

@@ -100,7 +100,7 @@ export default function Login() {
             <input
               type="text"
               value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              onChange={(e) => setIdentifier(e.target.value.trim())}
               onKeyDown={(e) => handleKeyDown(e, 'identifier')}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
               placeholder="البريد الإلكتروني أو رقم الهاتف"
@@ -114,7 +114,7 @@ export default function Login() {
               type="password"
               value={password}
               ref={passwordRef}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.trim())}
               onKeyDown={(e) => handleKeyDown(e, 'password')}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
               placeholder="**********"
