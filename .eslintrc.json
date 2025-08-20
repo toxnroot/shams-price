@@ -1,4 +1,33 @@
 {
+  "root": true,
+  "extends": ["next/core-web-vitals"],
+  "plugins": ["import", "react", "react-hooks"],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2022": true
+  },
+  "globals": {
+    "process": "readonly"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx"],
+        "moduleDirectory": ["node_modules", "src"]
+      }
+    }
+  },
+  "rules": {
+    "import/no-unresolved": "off",
+    "no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ]
+  }
+}
+
+{
   "env": {
     "browser": true,
     "es2021": true
