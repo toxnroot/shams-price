@@ -62,7 +62,7 @@ const SectionsRadio = () => {
   };
 
   return (
-    <div className="p-4 w-full max-w-4xl">
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6 w-full max-w-6xl">
       <h2 className="text-center text-xl font-semibold text-gray-800 mb-4">
         النشرات المتوفرة
       </h2>

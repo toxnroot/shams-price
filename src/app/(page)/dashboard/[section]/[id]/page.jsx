@@ -12,7 +12,7 @@ export default function Page({ params }) {
   const id = decodeURIComponent(unwrappedParams.id);
 
   return (
-    <ProtectedRoute redirectTo="/auth-admin">
+    <ProtectedRoute redirectTo="/auth/admin-login" role="admin">
       <div className="min-h-screen bg-gray-100 py-10 px-4 flex flex-col items-center gap-8">
         <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-6 border border-gray-200">
           <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">

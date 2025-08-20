@@ -52,7 +52,7 @@ export default function PriceingDocumentCreator() {
   };
 
   return (
-    <div className="p-6 w-full max-w-4xl  rounded-xl shadow-lg bg-white ">
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6 w-full max-w-6xl">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">إنشاء نشرة أسعار جديدة</h1>
 
       <div className="mb-4">

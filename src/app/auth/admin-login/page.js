@@ -6,6 +6,8 @@ import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import Image from 'next/image';
+import { loginUser } from '@/lib/authUtils';
+import toast from 'react-hot-toast';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -18,29 +20,24 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setStatus('');
     setLoading(true);
-
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
+      const { user, token } = await loginUser({ identifier: email, password, auth, db });
       const userDoc = await getDoc(doc(db, 'user-admin', user.uid));
       if (!userDoc.exists() || userDoc.data().role !== 'admin') {
         await signOut(auth);
-        setStatus('❌ ليس لديك صلاحية الدخول كمدير');
+        toast.error('❌ ليس لديك صلاحية الدخول كمدير');
         setLoading(false);
         return;
       }
-
-      const token = await user.getIdToken();
       if (typeof window !== 'undefined') {
         localStorage.setItem('idToken', token);
       }
-
-      setStatus('✅ تسجيل الدخول ناجح');
+      toast.success('✅ تسجيل الدخول ناجح');
+      setStatus('');
       router.push('/dashboard');
     } catch (error) {
-      console.error(error);
-      setStatus('⚠️ فشل تسجيل الدخول. تحقق من البريد وكلمة المرور');
+      toast.error('⚠️ فشل تسجيل الدخول. تحقق من البريد وكلمة المرور');
+      setStatus('');
     } finally {
       setLoading(false);
     }

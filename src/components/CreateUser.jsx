@@ -8,32 +8,24 @@ import {
 } from "firebase/auth";
 import { collection, getDocs, doc, setDoc } from "firebase/firestore";
 import Checkbox from "./NeonCheckbox";
+import useRoles from '@/lib/useRoles';
+import toast from 'react-hot-toast';
 
 export default function CreateUser() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState([]);
-  const [roles, setRoles] = useState([]);
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // جلب أسماء المستندات من مجموعة priceing
+  const { roles, loading: loadingRoles, error: errorRoles } = useRoles();
+
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "priceing"));
-        const roleList = querySnapshot.docs.map((doc) => doc.id);
-        setRoles(roleList);
-        if (roleList.length > 0) {
-          setRole([roleList[0]]); // تحديد الصلاحية الافتراضية كأول عنصر في المصفوفة
-        }
-      } catch (error) {
-        setStatus(`خطأ أثناء جلب الصلاحيات: ${error.message}`);
-      }
-    };
-    fetchRoles();
-  }, []);
+    if (roles.length > 0) {
+      setRole([roles[0]]);
+    }
+  }, [roles]);
 
   // إنشاء المستخدم
   const handleCreateUser = async () => {
@@ -53,7 +45,7 @@ export default function CreateUser() {
       // التحقق من وجود المستخدم باستخدام البريد الإلكتروني
       const signInMethods = await fetchSignInMethodsForEmail(auth, email);
       if (signInMethods.length > 0) {
-        setStatus("البريد الإلكتروني مستخدم بالفعل! يرجى اختيار بريد آخر.");
+        toast.error("البريد الإلكتروني مستخدم بالفعل! يرجى اختيار بريد آخر.");
         setIsLoading(false);
         return;
       }
@@ -74,7 +66,8 @@ export default function CreateUser() {
         createdAt: new Date().toISOString(),
       });
 
-      setStatus("تم إنشاء المستخدم بنجاح!");
+      setStatus("");
+      toast.success("تم إنشاء المستخدم بنجاح!");
       // إعادة تعيين الحقول
       setEmail("");
       setPassword("");
@@ -82,7 +75,7 @@ export default function CreateUser() {
       setRole(roles.length > 0 ? [roles[0]] : []);
       setIsLoading(false);
     } catch (error) {
-      setStatus(`خطأ أثناء إنشاء المستخدم: ${error.message}`);
+      toast.error(`خطأ أثناء إنشاء المستخدم: ${error.message}`);
       setIsLoading(false);
     }
   };
@@ -94,13 +87,19 @@ export default function CreateUser() {
       const newRole = prevRole.includes(value)
         ? prevRole.filter((r) => r !== value)
         : [...prevRole, value];
-      console.log("Updated role:", newRole); // للتشخيص
       return newRole;
     });
   };
 
+  if (loadingRoles) {
+    return <div className="text-center">جاري تحميل الصلاحيات...</div>;
+  }
+  if (errorRoles) {
+    return <div className="text-center text-red-600">{errorRoles}</div>;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6 w-full max-w-6xl flex items-center justify-centerk">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl">
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
           إنشاء مستخدم جديد

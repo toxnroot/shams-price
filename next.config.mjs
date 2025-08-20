@@ -1,13 +1,11 @@
 /** @type {import('next').NextConfig} */
-import withPWA from 'next-pwa';
-const nextConfig = {
-    reactStrictMode: true
-};
-const pwaConfig = withPWA({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development'
-});
 
-export default pwaConfig(nextConfig);
+const nextConfig = {
+  reactStrictMode: true,
+  // حل المشكلة الخاصة بـ next/image و Cloudinary
+  images: {
+    domains: ['res.cloudinary.com'],
+  },
+};
+
+export default nextConfig;

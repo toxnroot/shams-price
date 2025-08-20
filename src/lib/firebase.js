@@ -2,6 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, initializeFirestore, CACHE_SIZE_UNLIMITED } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { getMessaging, getToken, onMessage, deleteToken as deleteFcmToken } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -24,4 +25,11 @@ const db = initializeFirestore(app, {
 
 const auth = getAuth(app);
 
-export { db, auth };
+// تهيئة Firebase Messaging
+let messaging = null;
+if (typeof window !== 'undefined') {
+  messaging = getMessaging(app);
+}
+
+export { db, auth, messaging, getToken, onMessage };
+export const deleteToken = deleteFcmToken;

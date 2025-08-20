@@ -56,14 +56,15 @@ export default function LogoutButton({ path }) {
 <button
   onClick={handleLogout}
   disabled={loading}
-  className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ease-in-out px-2 py-1 rounded-full text-white text-sm ${
+  aria-label="تسجيل الخروج"
+  className={`flex items-center gap-2 w-fit text-center text-white px-2 py-1 rounded-full m-auto my-3 ${
     loading
       ? 'bg-gray-400 cursor-not-allowed'
       : 'bg-[#DC2525] hover:bg-red-700'
-  } w-8 hover:w-32 group`}
+  }   group`}
 >
   <LogOut size={16} className="flex-shrink-0" />
-  <span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+  <span className="whitespace-nowrap  group-hover:opacity-100 transition-opacity duration-200">
     تسجيل الخروج
   </span>
 </button>

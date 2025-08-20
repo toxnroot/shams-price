@@ -6,10 +6,15 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
+import { loginUser } from '@/lib/authUtils';
+import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -21,49 +26,40 @@ export default function Login() {
       setStatus('يرجى إدخال البريد أو رقم الهاتف وكلمة المرور');
       return;
     }
-
     setIsLoading(true);
     setStatus('جاري التحقق...');
-
     try {
-      let emailToUse = identifier;
-
-      // إذا كان الإدخال رقم هاتف، ابحث عن البريد المرتبط به
-      if (/^\d{10,15}$/.test(identifier)) {
-        const q = query(collection(db, 'users'), where('phone', '==', identifier));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          setStatus('رقم الهاتف غير مسجل');
-          setIsLoading(false);
-          return;
-        }
-
-        const userData = querySnapshot.docs[0].data();
-        emailToUse = userData.email;
-      }
-
-      // تسجيل الدخول بالبريد وكلمة المرور
-      const userCredential = await signInWithEmailAndPassword(auth, emailToUse, password);
-      const user = userCredential.user;
-
-      // استخدام localStorage فقط في المتصفح
+      const { user, token } = await loginUser({ identifier, password, auth, db });
       if (typeof window !== 'undefined') {
         localStorage.setItem('userUid', user.uid);
       }
-
-      const token = await user.getIdToken();
       await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       });
 
-      setStatus('✅ تم تسجيل الدخول بنجاح');
+      // الاشتراك التلقائي في الإشعارات للمستخدمين العاديين
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          console.log('تم منح إذن الإشعارات للمستخدم');
+        }
+      } catch (error) {
+        console.error('خطأ في طلب إذن الإشعارات:', error);
+      }
+
+      toast.success('تم تسجيل الدخول بنجاح');
+      setStatus('');
       router.push('/');
     } catch (error) {
-      console.error(error);
-      setStatus('❌ خطأ في تسجيل الدخول: تأكد من البيانات');
+      if (error.message.includes('Firebase: Error (auth/invalid-credential).')) {
+        toast.error('خطأ في تسجيل الدخول: كلمة المرور غير صحيحة');
+        setStatus('');
+      } else {
+        toast.error('خطأ في تسجيل الدخول: تأكد من البيانات');
+        setStatus('');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +90,6 @@ export default function Login() {
         </div>
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">تسجيل الدخول</h1>
         <div className="space-y-5">
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني أو رقم الهاتف</label>
             <input
@@ -106,21 +101,28 @@ export default function Login() {
               placeholder="البريد الإلكتروني أو رقم الهاتف"
             />
           </div>
-              
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
-            <input
-              type="password"
-              value={password}
-              ref={passwordRef}
-              onChange={(e) => setPassword(e.target.value.trim())}
-              onKeyDown={(e) => handleKeyDown(e, 'password')}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
-              placeholder="**********"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                ref={passwordRef}
+                onChange={(e) => setPassword(e.target.value.trim())}
+                onKeyDown={(e) => handleKeyDown(e, 'password')}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base pr-10"
+                placeholder="**********"
+              />
+              <span
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute inset-y-0 left-3 flex items-center cursor-pointer text-xl select-none"
+                title={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+              >
+                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              </span>
+            </div>
           </div>
-
 
           <button
             onClick={handleLogin}
@@ -132,7 +134,12 @@ export default function Login() {
             {isLoading ? 'جاري التحقق...' : 'تسجيل الدخول'}
           </button>
 
-          
+          <Link
+            href="/auth/register"
+            className="w-full block mt-2 py-3 rounded-lg text-[#A16D28] border border-[#A16D28] text-center font-semibold text-lg transition duration-200 hover:bg-[#A16D28]/10"
+          >
+            إنشاء حساب جديد
+          </Link>
         </div>
 
         {status && (
@@ -148,41 +155,3 @@ export default function Login() {
     </div>
   );
 }
-
-
-// 'use client';
-
-// import { TourProvider, useTour } from '@reactour/tour';
-
-// const steps = [
-//   {
-//     selector: '.my-button',
-//     content: 'اضغط على هذا الزر لبدء العملية',
-//   },
-//   {
-//     selector: '.my-input',
-//     content: 'ثم أدخل البيانات هنا',
-//   },
-// ];
-
-// export default function App() {
-//   return (
-//     <TourProvider steps={steps} showBadge={false} locale={{ close: 'إغلاق', last: 'إنهاء', next: 'التالي', skip: 'تخطي' }}>
-//       <Main />
-//     </TourProvider>
-//   );
-// }
-
-// function Main() {
-//   const { setIsOpen } = useTour();
-
-//   return (
-//     <div className="p-8">
-//       <button className="my-button px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setIsOpen(true)}>
-//         ابدأ الشرح
-//       </button>
-//       <br /><br />
-//       <input className="my-input border p-2 rounded" placeholder="اكتب هنا" onChange={() => setIsOpen(true)} />
-//     </div>
-//   );
-// }

@@ -5,6 +5,8 @@ import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import { loginUser } from '@/lib/authUtils';
+import toast from 'react-hot-toast';
 
 const LoginForm = ({ pathRouter = '/' }) => { // تعيين قيمة افتراضية
   const router = useRouter();
@@ -17,46 +19,21 @@ const LoginForm = ({ pathRouter = '/' }) => { // تعيين قيمة افترا�
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      let email = input;
-
-      // إذا كان الإدخال ليس بريدًا إلكترونيًا، ابحث عن البريد من اسم المستخدم
-      if (!input.includes('@')) {
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('name', '==', input));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          throw new Error('اسم المستخدم غير موجود');
-        }
-
-        const userData = querySnapshot.docs[0].data();
-        if (!userData.email) {
-          throw new Error('البريد الإلكتروني غير موجود لهذا المستخدم');
-        }
-        email = userData.email;
-      }
-
-      // تسجيل الدخول
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
-
+      const { token } = await loginUser({ identifier: input, password, auth, db });
       // إرسال التوكن إلى API
       const response = await fetch('/api/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       });
-
       if (!response.ok) {
         throw new Error('فشل في تحديث الجلسة');
       }
-
-      // إعادة التوجيه
+      toast.success('تم تسجيل الدخول بنجاح');
       router.push(pathRouter);
     } catch (err) {
-      setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
+      toast.error(err.message || 'حدث خطأ أثناء تسجيل الدخول');
     } finally {
       setLoading(false);
     }

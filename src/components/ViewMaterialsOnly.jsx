@@ -129,7 +129,7 @@ export default function ViewMaterialsOnly({ section, id, logTourInteraction }) {
   }
 
   return (
-    <div className="max-w-[95vw] sm:max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-[#A08558]/5 rounded-3xl shadow-2xl mt-8 border border-[#A08558]/20 relative overflow-hidden">
+    <div className="max-w-[95vw] sm:max-w-full mx-auto pt-8 bg-gradient-to-br from-white to-[#A08558]/5 rounded-3xl shadow-2xl mt-8 border border-[#A08558]/20 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#A08558] via-[#C4A46B] to-[#A08558]"></div>
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#A08558]/10 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
 
@@ -217,7 +217,7 @@ export default function ViewMaterialsOnly({ section, id, logTourInteraction }) {
       )}
 
       {filteredMaterials.length > 0 ? (
-        <div className="grid gap-6">
+        <div className="grid gap-6 w-full">
           {filteredMaterials.map((item, index) => (
             <ProductCard
               key={index}

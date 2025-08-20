@@ -7,14 +7,6 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import SectionCard from '@/components/SectionCard';
 import Loading from '@/components/loading';
-import { TourProvider  } from '@reactour/tour';
-
-const steps = [
-  {
-    selector: '.section-card',
-    content: 'الخامات هي الأقسام المتاحة لك. يمكنك الضغط على أي قسم لعرض التفاصيل الخاصة به.',
-  },
-];
 
 export default function Home() {
   const [sections, setSections] = useState({});
@@ -120,41 +112,6 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <TourProvider steps={steps} showBadge={false} locale={{ close: 'إغلاق', last: 'إنهاء', next: 'التالي', skip: 'تخطي' }}   styles={{
-    popover: (base) => ({
-      ...base,
-      backgroundColor: '#fff8f0',
-      borderRadius: '16px',
-      padding: '20px',
-      color: '#333',
-      fontFamily: 'Cairo, sans-serif',
-      direction: 'rtl',
-    }),
-    maskArea: (base) => ({
-      ...base,
-      rx: 8, // حواف دائرية للعنصر المضاء
-    }),
-    controls: (base) => ({
-      ...base,
-      justifyContent: 'flex-start', // لتكون الأزرار في اليمين (للعربية)
-    }),
-    badge: (base) => ({
-      ...base,
-      backgroundColor: '#A16D28',
-    }),
-    close: (base) => ({
-      ...base,
-      color: '#A16D28',
-      fontSize: '20px',
-      fontWeight: 'bold',
-      cursor: 'pointer',
-      top: '10px',
-      '&:hover': {
-        color: '#A16D28',
-      },
-
-    }),
-  }} >
       <div className="min-h-screen max-h-full p-6 bg-gray-100 flex flex-col items-center justify-center">
         {status && (
           <p className={`text-sm text-center mb-4 ${status.includes('بنجاح') ? 'text-green-600' : 'text-red-600'}`}>
@@ -171,7 +128,6 @@ export default function Home() {
           )
         )}
       </div>
-      </TourProvider>
     </ProtectedRoute>
   );
 }

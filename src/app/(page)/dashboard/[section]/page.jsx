@@ -8,7 +8,7 @@ export default function Page({ params }) {
 
   return (
     <div className="p-4 flex flex-col items-center justify-center">
-      <ProtectedRoute redirectTo="/auth-admin">
+      <ProtectedRoute redirectTo="/auth/admin-login" role="admin">
         <AddSection docId={section} />
         <DisplaySections docId={section}/>
       </ProtectedRoute>

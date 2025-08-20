@@ -38,3 +38,61 @@ body {
   font-family: Tajawal, Arial, Helvetica, sans-serif;
   direction: rtl;
 }
+
+body.dark {
+  background-color: #18181b;
+  color: #f3f4f6;
+}
+body.dark .bg-white {
+  background-color: #23232a !important;
+}
+body.dark .text-gray-800, body.dark .text-gray-700, body.dark .text-gray-600 {
+  color: #f3f4f6 !important;
+}
+body.dark .bg-gray-100, body.dark .bg-gray-200 {
+  background-color: #23232a !important;
+}
+body.dark .border-gray-200, body.dark .border-gray-100 {
+  border-color: #444 !important;
+}
+body.dark .shadow-md, body.dark .shadow-lg {
+  box-shadow: 0 2px 8px 0 #00000055 !important;
+}
+body.dark .bg-\[\#A08558\] {
+  background-color: #A08558 !important;
+}
+body.dark .text-\[\#A08558\] {
+  color: #A08558 !important;
+}
+body.dark .bg-gradient-to-br {
+  background: linear-gradient(135deg, #23232a 60%, #A08558 100%) !important;
+}
+body.dark .bg-gradient-to-r {
+  background: linear-gradient(90deg, #23232a 60%, #A08558 100%) !important;
+}
+body.dark .bg-gradient-to-bl {
+  background: linear-gradient(225deg, #23232a 60%, #A08558 100%) !important;
+}
+body.dark input, body.dark textarea, body.dark select {
+  background-color: #23232a !important;
+  color: #f3f4f6 !important;
+  border-color: #444 !important;
+}
+body.dark .rounded-xl, body.dark .rounded-2xl, body.dark .rounded-3xl {
+  background-color: #23232a !important;
+}
+body.dark .hover\:bg-gray-100:hover, body.dark .hover\:bg-gray-200:hover {
+  background-color: #333 !important;
+}
+body.dark .bg-red-50 {
+  background-color: #3b1f1f !important;
+}
+body.dark .text-red-600 {
+  color: #ff6b6b !important;
+}
+body.dark .bg-green-50 {
+  background-color: #1f3b1f !important;
+}
+body.dark .text-green-700 {
+  color: #6bffb2 !important;
+}
