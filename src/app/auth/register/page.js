@@ -112,11 +112,12 @@ export default function Register() {
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-6">
           <Image
-            src="/logo.ico"
+            src="/logo.webp"
             alt="Logo"
             width={120}
             height={120}
             className="rounded-full"
+            
           />
         </div>
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">إنشاء حساب</h1>
@@ -130,6 +131,7 @@ export default function Register() {
               onKeyDown={(e) => handleKeyDown(e, 'name')}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
               placeholder="أدخل الاسم الكامل"
+              id='name'
             />
           </div>
 
@@ -144,6 +146,9 @@ export default function Register() {
               onKeyDown={(e) => handleKeyDown(e, 'phone')}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
               placeholder="أدخل رقم الهاتف"
+              pattern="[0-9]{10,15}"
+              title="يرجى إدخال رقم هاتف صحيح (10-15 رقم)"
+              id='phone'
             />
           </div>
 
@@ -157,6 +162,7 @@ export default function Register() {
               onKeyDown={(e) => handleKeyDown(e, 'email')}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
               placeholder="أدخل البريد الإلكتروني"
+              id='email'
             />
           </div>
 
@@ -171,6 +177,7 @@ export default function Register() {
                 onKeyDown={(e) => handleKeyDown(e, 'password')}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base pr-10"
                 placeholder="أدخل كلمة المرور"
+                id='password'
               />
               <span
                 onClick={() => setShowPassword((v) => !v)}
@@ -191,6 +198,7 @@ export default function Register() {
                 onChange={(e) => setConfirmPassword(e.target.value.trim())}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base pr-10"
                 placeholder="تأكيد كلمة المرور"
+                id='confirmPassword'
               />
               <span
                 onClick={() => setShowConfirmPassword((v) => !v)}

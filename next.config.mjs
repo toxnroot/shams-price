@@ -6,9 +6,13 @@ const nextConfig = {
     // تخطي فحص ESLint أثناء البناء (Netlify) لتفادي فشل البناء بسبب أخطاء lint
     ignoreDuringBuilds: true,
   },
-  // حل المشكلة الخاصة بـ next/image و Cloudinary
   images: {
-    domains: ['res.cloudinary.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+    ],
   },
 };
 

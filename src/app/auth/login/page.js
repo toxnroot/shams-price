@@ -81,11 +81,12 @@ export default function Login() {
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-6">
           <Image
-            src="/logo.ico"
+            src="/logo.webp"
             alt="Logo"
             width={120}
             height={120}
             className="rounded-full"
+            
           />
         </div>
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">تسجيل الدخول</h1>

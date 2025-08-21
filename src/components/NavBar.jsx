@@ -99,11 +99,12 @@ const NavBar = () => {
         <Link href="/" className="flex items-center gap-2">
           <div className="w-10 h-10 relative flex-shrink-0">
             <Image
-              src="/logo.ico"
+              src="/logo.webp"
               alt="SHAMS TEX Logo"
               fill
               sizes="40px"
               className="object-contain"
+              priority
             />
           </div>
           <span className="text-2xl font-bold text-[#A08558] leading-tight">
