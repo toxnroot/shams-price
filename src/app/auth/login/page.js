@@ -100,6 +100,7 @@ export default function Login() {
               onKeyDown={(e) => handleKeyDown(e, 'identifier')}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
               placeholder="البريد الإلكتروني أو رقم الهاتف"
+              id="identifier"
             />
           </div>
 
@@ -114,6 +115,7 @@ export default function Login() {
                 onKeyDown={(e) => handleKeyDown(e, 'password')}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base pr-10"
                 placeholder="**********"
+                id="password"
               />
               <span
                 onClick={() => setShowPassword((v) => !v)}
